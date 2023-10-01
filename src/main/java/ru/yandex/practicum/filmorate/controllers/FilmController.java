@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FilmController {
     private int id = 1;
-    final private Map<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, Film> films = new HashMap<>();
 
     @PostMapping("/films")
-    public Film createFilm(@Valid @RequestBody Film film, BindingResult bindingResult){
+    public Film createFilm(@Valid @RequestBody Film film, BindingResult bindingResult) {
         log.trace("Start create film");
         validationFilm(film, bindingResult);
         Film newFilm = film.toBuilder().id(getNextId()).build();
@@ -29,15 +29,15 @@ public class FilmController {
     }
 
     @GetMapping("/films")
-    public List<Film> getAllFilms(){
+    public List<Film> getAllFilms() {
         return new ArrayList<>(films.values());
     }
 
     @PutMapping("/films")
-    public Film updateFilm(@Valid @RequestBody Film film, BindingResult bindingResult){
+    public Film updateFilm(@Valid @RequestBody Film film, BindingResult bindingResult) {
         log.info("Start update film");
         validationFilm(film, bindingResult);
-        if(films.containsKey(film.getId())){
+        if (films.containsKey(film.getId())) {
             Film newFilm = films.get(film.getId())
                     .toBuilder()
                     .id(film.getId())
@@ -55,20 +55,20 @@ public class FilmController {
         }
     }
 
-    private void validationFilm(Film film, BindingResult bindingResult){
+    private void validationFilm(Film film, BindingResult bindingResult) {
         log.info("Start validation film");
         StringBuilder errorMsg = new StringBuilder(bindingResult.getFieldErrors()
                 .stream()
                 .map(s -> s.getField() + " " + s.getDefaultMessage())
                 .collect(Collectors.joining(";")))
                 .append((film.getReleaseDate().isBefore(Film.MIN_DATE)) ? "Release date less than min release date" : "");
-        if(errorMsg.length() > 0){
+        if (errorMsg.length() > 0) {
             throw new ValidationException(errorMsg.toString());
         }
         log.info("Film is valid");
     }
 
-    private int getNextId(){
+    private int getNextId() {
         return id++;
     }
 }

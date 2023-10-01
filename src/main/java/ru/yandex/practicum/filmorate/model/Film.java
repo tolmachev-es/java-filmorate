@@ -19,5 +19,5 @@ public class Film {
     LocalDate releaseDate;
     @Positive(message = "Duration should be greater than 0")
     int duration;
-    public final static LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
+    public static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
 }
