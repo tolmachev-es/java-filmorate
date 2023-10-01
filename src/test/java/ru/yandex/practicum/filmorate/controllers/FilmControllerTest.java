@@ -50,6 +50,7 @@ class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(newFilm))
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
+
         Assertions.assertTrue(nestedServletException.getMessage().contains("Title can not be empty"));
     }
     @Test
@@ -141,7 +142,11 @@ class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(newFilm))
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        Assertions.assertTrue(nestedServletException.getMessage().contains("Duration should be greater than 0"));
+        try {
+            Assertions.assertTrue(nestedServletException.getMessage().contains("Duration should be greater than 0"));
+        } catch (NullPointerException e){
+            Assertions.fail();
+        }
     }
 
     @Test
@@ -152,7 +157,11 @@ class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(newFilm))
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        Assertions.assertTrue(nestedServletException.getMessage().contains("Film not found"));
+        try {
+            Assertions.assertTrue(nestedServletException.getMessage().contains("Film not found"));
+        } catch (NullPointerException e){
+            Assertions.fail();
+        }
     }
 
     @Test

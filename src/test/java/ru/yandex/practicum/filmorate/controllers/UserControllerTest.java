@@ -66,11 +66,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(newUser))
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        try {
-            Assertions.assertTrue(nestedServletException.getMessage().contains("Login must should not be empty"));
-        } catch (NullPointerException e){
-            Assertions.assertTrue(e.getMessage().contains("NullPointerException"));
-        }
+        Assertions.assertTrue(nestedServletException.getMessage().contains("Login must should not be empty"));
     }
 
     @Test
