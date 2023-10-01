@@ -54,7 +54,7 @@ class UserControllerTest {
         try {
             Assertions.assertTrue(nestedServletException.getMessage().contains("Email is incorrect"));
         } catch (NullPointerException e){
-            Assertions.assertTrue(e.getMessage().contains("NullPointerException"));
+            Assertions.fail();
         }
     }
 
