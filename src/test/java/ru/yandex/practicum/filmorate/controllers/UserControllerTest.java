@@ -39,7 +39,7 @@ class UserControllerTest {
             .build();
 
     @BeforeEach
-    void createMock(){
+    void createMock() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
@@ -53,7 +53,7 @@ class UserControllerTest {
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
         try {
             Assertions.assertTrue(nestedServletException.getMessage().contains("Email is incorrect"));
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             Assertions.fail();
         }
     }
@@ -141,7 +141,7 @@ class UserControllerTest {
         Assertions.assertEquals(resultString, getAllUser.andReturn().getResponse().getContentAsString());
     }
 
-    private static String convertToJson(User user){
+    private static String convertToJson(User user) {
         String date = "\"birthday\":\"" + user.getBirthday().format(DateTimeFormatter.ofPattern("yyyy-MM-dd\""));
         return asJsonString(
                 new ArrayList<>(Collections.singleton(user)))
@@ -153,7 +153,7 @@ class UserControllerTest {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
             return objectMapper.writeValueAsString(obj);
-        } catch (RuntimeException | JsonProcessingException e){
+        } catch (RuntimeException | JsonProcessingException e) {
             throw new RuntimeException();
         }
     }
