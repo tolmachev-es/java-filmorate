@@ -38,12 +38,12 @@ class FilmControllerTest {
             .build();
 
     @BeforeEach
-    void createController(){
+    void createController() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
-    void createFilmNameBlank(){
+    void createFilmNameBlank() {
         Film newFilm = film.toBuilder().title("").build();
         NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
                 () -> mockMvc.perform(MockMvcRequestBuilders.post("/films")
@@ -57,7 +57,7 @@ class FilmControllerTest {
         }
     }
     @Test
-    void createFilmDescriptionMoreThan200Length(){
+    void createFilmDescriptionMoreThan200Length() {
         Film newFilm = film.toBuilder().description(film.getDescription() + film.getDescription()).build();
         NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
                 () -> mockMvc.perform(MockMvcRequestBuilders.post("/films")
@@ -73,7 +73,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void createFilmIncorrectDate(){
+    void createFilmIncorrectDate() {
         Film newFilm = film.toBuilder().releaseDate(LocalDate.MIN).build();
         NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
                 () -> mockMvc.perform(MockMvcRequestBuilders.post("/films")
@@ -89,7 +89,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void createFilmIncorrectDuration(){
+    void createFilmIncorrectDuration() {
         Film newFilm = film.toBuilder().duration(-1).build();
         NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
                 () -> mockMvc.perform(MockMvcRequestBuilders.post("/films")
@@ -122,7 +122,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void updateFilmNameBlank(){
+    void updateFilmNameBlank() {
         Film newFilm = film.toBuilder().title("").build();
         NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
                 () -> mockMvc.perform(MockMvcRequestBuilders.put("/films")
@@ -138,7 +138,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void updateFilmDescriptionMoreThan200Length(){
+    void updateFilmDescriptionMoreThan200Length() {
         Film newFilm = film.toBuilder().description(film.getDescription() + film.getDescription()).build();
         NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
                 () -> mockMvc.perform(MockMvcRequestBuilders.put("/films")
@@ -154,7 +154,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void updateFilmIncorrectDate(){
+    void updateFilmIncorrectDate() {
         Film newFilm = film.toBuilder().releaseDate(LocalDate.MIN).build();
         NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
                 () -> mockMvc.perform(MockMvcRequestBuilders.put("/films")
@@ -170,7 +170,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void updateFilmIncorrectDuration(){
+    void updateFilmIncorrectDuration() {
         Film newFilm = film.toBuilder().duration(-1).build();
         NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
                 () -> mockMvc.perform(MockMvcRequestBuilders.put("/films")
@@ -185,7 +185,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void updateFilmNotFound(){
+    void updateFilmNotFound() {
         Film newFilm = film.toBuilder().id(9999).build();
         NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
                 () -> mockMvc.perform(MockMvcRequestBuilders.put("/films")
@@ -247,7 +247,7 @@ class FilmControllerTest {
         Assertions.assertEquals(resultString, getAllTask.andReturn().getResponse().getContentAsString());
     }
 
-    private static String convertToJson(Film film){
+    private static String convertToJson(Film film) {
         String date = "\"releaseDate\":\"" + film.getReleaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd\""));
         return asJsonString(
                 new ArrayList<>(Collections.singleton(film)))
