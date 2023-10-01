@@ -52,7 +52,7 @@ class FilmControllerTest {
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
         try {
             Assertions.assertTrue(nestedServletException.getMessage().contains("Title can not be empty"));
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             Assertions.fail();
         }
     }
@@ -66,7 +66,7 @@ class FilmControllerTest {
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
         try {
             Assertions.assertTrue(nestedServletException.getMessage().contains("Description should be less than 200 length"));
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             Assertions.fail();
         }
 
@@ -82,7 +82,7 @@ class FilmControllerTest {
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
         try {
             Assertions.assertTrue(nestedServletException.getMessage().contains("Release date less than min release date"));
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             Assertions.fail();
         }
 
@@ -98,7 +98,7 @@ class FilmControllerTest {
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
         try {
             Assertions.assertTrue(nestedServletException.getMessage().contains("Duration should be greater than 0"));
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             Assertions.fail();
         }
 
@@ -116,7 +116,7 @@ class FilmControllerTest {
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
         try {
             Assertions.assertEquals(convertToJson(resultFilm), getAllTask.andReturn().getResponse().getContentAsString());
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             Assertions.fail();
         }
     }
@@ -132,7 +132,7 @@ class FilmControllerTest {
                         .andExpect(MockMvcResultMatchers.status().isBadRequest()));
         try {
             Assertions.assertTrue(nestedServletException.getMessage().contains("Title can not be empty"));
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             Assertions.fail();
         }
     }
@@ -148,7 +148,7 @@ class FilmControllerTest {
                         .andExpect(MockMvcResultMatchers.status().isBadRequest()));
         try {
             Assertions.assertTrue(nestedServletException.getMessage().contains("Description should be less than 200 length"));
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             Assertions.fail();
         }
     }
@@ -163,7 +163,7 @@ class FilmControllerTest {
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
         try {
             Assertions.assertTrue(nestedServletException.getMessage().contains("Release date less than min release date"));
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             Assertions.fail();
         }
 
@@ -179,7 +179,7 @@ class FilmControllerTest {
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
         try {
             Assertions.assertTrue(nestedServletException.getMessage().contains("Duration should be greater than 0"));
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             Assertions.fail();
         }
     }
@@ -194,7 +194,7 @@ class FilmControllerTest {
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
         try {
             Assertions.assertTrue(nestedServletException.getMessage().contains("Film not found"));
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             Assertions.fail();
         }
     }
