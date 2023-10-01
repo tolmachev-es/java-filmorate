@@ -17,12 +17,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserController {
     private int id = 1;
-    private Map<Integer, User> userMap = new HashMap<>();
+    final private Map<Integer, User> userMap = new HashMap<>();
 
     @PostMapping("/users")
     public User createUser(@Valid @RequestBody User user, BindingResult bindingResult){
         log.trace("Start create user");
-        validateUser(user, bindingResult);
+        validateUser(bindingResult);
         User newUser = user.toBuilder()
                 .id(getNextId())
                 .name(user.getName().isBlank() ? user.getLogin() : user.getName())
@@ -33,7 +33,7 @@ public class UserController {
 
     @PutMapping("/users")
     public User updateUser(@Valid @RequestBody User user, BindingResult bindingResult){
-        validateUser(user, bindingResult);
+        validateUser(bindingResult);
         if(userMap.containsKey(user.getId())){
             User newUser = userMap.get(user.getId()).toBuilder()
                     .email(user.getEmail())
@@ -53,7 +53,7 @@ public class UserController {
         return new ArrayList<>(userMap.values());
     }
 
-    private void validateUser(User user, BindingResult bindingResult){
+    private void validateUser(BindingResult bindingResult){
         log.info("Start validating user");
         StringBuilder errorMsg = new StringBuilder(bindingResult.getFieldErrors()
                 .stream()

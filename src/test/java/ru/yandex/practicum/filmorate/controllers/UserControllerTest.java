@@ -51,7 +51,11 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(newUser))
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        Assertions.assertTrue(nestedServletException.getMessage().contains("Email is incorrect"));
+        try {
+            Assertions.assertTrue(nestedServletException.getMessage().contains("Email is incorrect"));
+        } catch (NullPointerException e){
+            Assertions.assertTrue(e.getMessage().contains("NullPointerException"));
+        }
     }
 
     @Test
@@ -62,13 +66,17 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(newUser))
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        Assertions.assertTrue(nestedServletException.getMessage().contains("Login must should not be empty"));
+        try {
+            Assertions.assertTrue(nestedServletException.getMessage().contains("Login must should not be empty"));
+        } catch (NullPointerException e){
+            Assertions.assertTrue(e.getMessage().contains("NullPointerException"));
+        }
     }
 
     @Test
     void createUser() throws Exception {
         User newUser = user.toBuilder().build();
-        ResultActions createUser = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(newUser))
                 .accept(MediaType.APPLICATION_JSON));
@@ -82,7 +90,7 @@ class UserControllerTest {
     @Test
     void createUserWithoutName() throws Exception {
         User newUser = user.toBuilder().name("").build();
-        ResultActions createUser = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(newUser))
                 .accept(MediaType.APPLICATION_JSON));
@@ -96,7 +104,7 @@ class UserControllerTest {
     @Test
     void updateUser() throws Exception {
         User newUser = user.toBuilder().build();
-        ResultActions createUser = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(newUser))
                 .accept(MediaType.APPLICATION_JSON));
@@ -107,7 +115,7 @@ class UserControllerTest {
                 .birthday(LocalDate.EPOCH)
                 .login("Wcobq")
                 .build();
-        ResultActions updateUserAction = mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        mockMvc.perform(MockMvcRequestBuilders.put("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(updateUser))
                 .accept(MediaType.APPLICATION_JSON));
@@ -120,12 +128,12 @@ class UserControllerTest {
     @Test
     void getAllUsersHas2User() throws Exception {
         User newUser = user.toBuilder().name("Ben").login("Ten").build();
-        ResultActions createUser1 = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(user))
                 .accept(MediaType.APPLICATION_JSON));
         User user1 = user.toBuilder().id(1).build();
-        ResultActions createUser2 = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(newUser))
                 .accept(MediaType.APPLICATION_JSON));

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FilmController {
     private int id = 1;
-    private Map<Integer, Film> films = new HashMap<>();
+    final private Map<Integer, Film> films = new HashMap<>();
 
     @PostMapping("/films")
     public Film createFilm(@Valid @RequestBody Film film, BindingResult bindingResult){
