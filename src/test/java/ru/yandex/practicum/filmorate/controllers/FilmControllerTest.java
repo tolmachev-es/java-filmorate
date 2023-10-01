@@ -30,7 +30,7 @@ class FilmControllerTest {
     MockMvc mockMvc;
     Film film = Film.builder()
             .id(1)
-            .title("The Man From Earth")
+            .name("The Man From Earth")
             .releaseDate(LocalDate.of(2007, 2, 14))
             .description("It stars David Lee Smith as John Oldman, a " +
                     "departing university professor, who puts forth the notion that he is more than 14,000 years old.")
@@ -44,7 +44,7 @@ class FilmControllerTest {
 
     @Test
     void createFilmNameBlank() {
-        Film newFilm = film.toBuilder().title("").build();
+        Film newFilm = film.toBuilder().name("").build();
         NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
                 () -> mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -124,7 +124,7 @@ class FilmControllerTest {
 
     @Test
     void updateFilmNameBlank() {
-        Film newFilm = film.toBuilder().title("").build();
+        Film newFilm = film.toBuilder().name("").build();
         NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
                 () -> mockMvc.perform(MockMvcRequestBuilders.put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -210,7 +210,7 @@ class FilmControllerTest {
         Film resultFilm = film.toBuilder()
                 .id(1)
                 .duration(110)
-                .title("Demolution man")
+                .name("Demolution man")
                 .description("Stallone and Blade punch each other in the face")
                 .releaseDate(LocalDate.of(1993, 8, 12))
                 .build();
@@ -229,7 +229,7 @@ class FilmControllerTest {
         Film newFilm1 = film.toBuilder().build();
         Film newFilm2 = film.toBuilder()
                 .duration(110)
-                .title("Demolution man")
+                .name("Demolution man")
                 .description("Stallone and Blade punch each other in the face")
                 .releaseDate(LocalDate.of(1993, 8, 12))
                 .build();

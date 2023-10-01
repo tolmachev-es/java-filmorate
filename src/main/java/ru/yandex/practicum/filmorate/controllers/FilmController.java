@@ -41,7 +41,7 @@ public class FilmController {
             Film newFilm = films.get(film.getId())
                     .toBuilder()
                     .id(film.getId())
-                    .title(film.getTitle())
+                    .name(film.getName())
                     .duration(film.getDuration())
                     .description(film.getDescription())
                     .releaseDate(film.getReleaseDate())

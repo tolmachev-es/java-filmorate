@@ -9,7 +9,6 @@ import java.time.LocalDate;
 @Value
 @Builder(toBuilder = true)
 public class User {
-    @Min(value = 0, message = "Id should be greater than 0")
     int id;
     @Email(message = "Email is incorrect")
     String email;

@@ -25,7 +25,7 @@ public class UserController {
         validateUser(bindingResult);
         User newUser = user.toBuilder()
                 .id(getNextId())
-                .name(user.getName().isBlank() ? user.getLogin() : user.getName())
+                .name((user.getName() == null || user.getName().isBlank()) ? user.getLogin() : user.getName())
                 .build();
         userMap.put(newUser.getId(), newUser);
         return newUser;

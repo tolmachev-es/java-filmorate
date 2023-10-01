@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public class Film {
     int id;
     @NotBlank(message = "Title can not be empty")
-    String title;
+    String name;
     @Length(max = 200, message = "Description should be less than 200 length")
     String description;
     @NotNull(message = "Release date is incorrect")
