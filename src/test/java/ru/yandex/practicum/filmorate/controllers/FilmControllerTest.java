@@ -56,6 +56,7 @@ class FilmControllerTest {
             Assertions.fail();
         }
     }
+
     @Test
     void createFilmDescriptionMoreThan200Length() {
         Film newFilm = film.toBuilder().description(film.getDescription() + film.getDescription()).build();
@@ -259,7 +260,7 @@ class FilmControllerTest {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
             return objectMapper.writeValueAsString(obj);
-        } catch (RuntimeException | JsonProcessingException e){
+        } catch (RuntimeException | JsonProcessingException e) {
             throw new RuntimeException();
         }
     }
