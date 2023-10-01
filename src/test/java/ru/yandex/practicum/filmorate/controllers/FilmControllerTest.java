@@ -50,8 +50,11 @@ class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(newFilm))
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-
-        Assertions.assertTrue(nestedServletException.getMessage().contains("Title can not be empty"));
+        try {
+            Assertions.assertTrue(nestedServletException.getMessage().contains("Title can not be empty"));
+        } catch (NullPointerException e){
+            Assertions.fail();
+        }
     }
     @Test
     void createFilmDescriptionMoreThan200Length(){
@@ -61,7 +64,12 @@ class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(newFilm))
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        Assertions.assertTrue(nestedServletException.getMessage().contains("Description should be less than 200 length"));
+        try {
+            Assertions.assertTrue(nestedServletException.getMessage().contains("Description should be less than 200 length"));
+        } catch (NullPointerException e){
+            Assertions.fail();
+        }
+
     }
 
     @Test
@@ -72,7 +80,12 @@ class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(newFilm))
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        Assertions.assertTrue(nestedServletException.getMessage().contains("Release date less than min release date"));
+        try {
+            Assertions.assertTrue(nestedServletException.getMessage().contains("Release date less than min release date"));
+        } catch (NullPointerException e){
+            Assertions.fail();
+        }
+
     }
 
     @Test
@@ -83,7 +96,12 @@ class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(newFilm))
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        Assertions.assertTrue(nestedServletException.getMessage().contains("Duration should be greater than 0"));
+        try {
+            Assertions.assertTrue(nestedServletException.getMessage().contains("Duration should be greater than 0"));
+        } catch (NullPointerException e){
+            Assertions.fail();
+        }
+
     }
 
     @Test
@@ -96,7 +114,11 @@ class FilmControllerTest {
         Film resultFilm = film.toBuilder().id(1).build();
         ResultActions getAllTask = mockMvc.perform(MockMvcRequestBuilders.get("/films")
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
-        Assertions.assertEquals(convertToJson(resultFilm), getAllTask.andReturn().getResponse().getContentAsString());
+        try {
+            Assertions.assertEquals(convertToJson(resultFilm), getAllTask.andReturn().getResponse().getContentAsString());
+        } catch (NullPointerException e){
+            Assertions.fail();
+        }
     }
 
     @Test
@@ -108,7 +130,11 @@ class FilmControllerTest {
                         .content(asJsonString(newFilm))
                         .accept(MediaType.APPLICATION_JSON))
                         .andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        Assertions.assertTrue(nestedServletException.getMessage().contains("Name can not be empty"));
+        try {
+            Assertions.assertTrue(nestedServletException.getMessage().contains("Title can not be empty"));
+        } catch (NullPointerException e){
+            Assertions.fail();
+        }
     }
 
     @Test
@@ -120,7 +146,11 @@ class FilmControllerTest {
                         .content(asJsonString(newFilm))
                         .accept(MediaType.APPLICATION_JSON))
                         .andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        Assertions.assertTrue(nestedServletException.getMessage().contains("Description should be less than 200 length"));
+        try {
+            Assertions.assertTrue(nestedServletException.getMessage().contains("Description should be less than 200 length"));
+        } catch (NullPointerException e){
+            Assertions.fail();
+        }
     }
 
     @Test
@@ -131,7 +161,12 @@ class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(newFilm))
                         .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        Assertions.assertTrue(nestedServletException.getMessage().contains("Release date less than min release date"));
+        try {
+            Assertions.assertTrue(nestedServletException.getMessage().contains("Release date less than min release date"));
+        } catch (NullPointerException e){
+            Assertions.fail();
+        }
+
     }
 
     @Test
@@ -197,10 +232,10 @@ class FilmControllerTest {
                 .description("Stallone and Blade punch each other in the face")
                 .releaseDate(LocalDate.of(1993, 8, 12))
                 .build();
-        ResultActions createFilm1 = mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(newFilm1)).accept(MediaType.APPLICATION_JSON));
-        ResultActions createFilm2 = mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(newFilm2)).accept(MediaType.APPLICATION_JSON));
         Film resultFilm1 = newFilm1.toBuilder().id(1).build();
