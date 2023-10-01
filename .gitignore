@@ -18,7 +18,6 @@ mvnw.cmd
 HELP.md
 lombok.config
 suppressions.xml
-checkstyle.xml
 
 ### STS ###
 .apt_generated
