@@ -118,7 +118,7 @@ class FilmControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(film)).accept(MediaType.APPLICATION_JSON));
         NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
-                () ->mockMvc.perform(MockMvcRequestBuilders.put("/films")
+                () -> mockMvc.perform(MockMvcRequestBuilders.put("/films")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newFilm)).accept(MediaType.APPLICATION_JSON)));
         Assertions.assertTrue(nestedServletException.getMessage().contains("Film not found"));
