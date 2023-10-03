@@ -1,33 +1,33 @@
 package ru.yandex.practicum.filmorate.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.util.NestedServletException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
-@SpringBootTest
+
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@WebMvcTest(FilmController.class)
 class FilmControllerTest {
     @Autowired
-    WebApplicationContext webApplicationContext;
     MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+
     Film film = Film.builder()
             .id(1)
             .name("The Man From Earth")
@@ -37,72 +37,28 @@ class FilmControllerTest {
             .duration(87)
             .build();
 
-    @BeforeEach
-    void createController() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
-
     @Test
-    void createFilmNameBlank() {
+    void createFilmNameBlank() throws Exception {
         Film newFilm = film.toBuilder().name("").build();
-        NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
-                () -> mockMvc.perform(MockMvcRequestBuilders.post("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(newFilm))
-                        .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        try {
-            Assertions.assertTrue(nestedServletException.getMessage().contains("Title can not be empty"));
-        } catch (NullPointerException e) {
-            Assertions.fail();
-        }
+        postToFilmBadRequest(newFilm, "Title can not be empty");
     }
 
     @Test
-    void createFilmDescriptionMoreThan200Length() {
+    void createFilmDescriptionMoreThan200Length() throws Exception {
         Film newFilm = film.toBuilder().description(film.getDescription() + film.getDescription()).build();
-        NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
-                () -> mockMvc.perform(MockMvcRequestBuilders.post("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(newFilm))
-                        .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        try {
-            Assertions.assertTrue(nestedServletException.getMessage().contains("Description should be less than 200 length"));
-        } catch (NullPointerException e) {
-            Assertions.fail();
-        }
-
+        postToFilmBadRequest(newFilm, "Description should be less than 200 length");
     }
 
     @Test
-    void createFilmIncorrectDate() {
+    void createFilmIncorrectDate() throws Exception {
         Film newFilm = film.toBuilder().releaseDate(LocalDate.MIN).build();
-        NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
-                () -> mockMvc.perform(MockMvcRequestBuilders.post("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(newFilm))
-                        .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        try {
-            Assertions.assertTrue(nestedServletException.getMessage().contains("Release date less than min release date"));
-        } catch (NullPointerException e) {
-            Assertions.fail();
-        }
-
+        postToFilmBadRequest(newFilm, "Release date less than min release date");
     }
 
     @Test
-    void createFilmIncorrectDuration() {
+    void createFilmIncorrectDuration() throws Exception {
         Film newFilm = film.toBuilder().duration(-1).build();
-        NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
-                () -> mockMvc.perform(MockMvcRequestBuilders.post("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(newFilm))
-                        .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        try {
-            Assertions.assertTrue(nestedServletException.getMessage().contains("Duration should be greater than 0"));
-        } catch (NullPointerException e) {
-            Assertions.fail();
-        }
-
+        postToFilmBadRequest(newFilm, "Duration should be greater than 0");
     }
 
     @Test
@@ -110,94 +66,62 @@ class FilmControllerTest {
         Film newFilm = film.toBuilder().build();
         ResultActions ra = mockMvc.perform(MockMvcRequestBuilders.post("/films")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(newFilm)).accept(MediaType.APPLICATION_JSON));
+                .content(objectMapper.writeValueAsString(newFilm)).accept(MediaType.APPLICATION_JSON));
         Assertions.assertEquals(200, ra.andReturn().getResponse().getStatus());
         Film resultFilm = film.toBuilder().id(1).build();
         ResultActions getAllTask = mockMvc.perform(MockMvcRequestBuilders.get("/films")
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
-        try {
-            Assertions.assertEquals(convertToJson(resultFilm), getAllTask.andReturn().getResponse().getContentAsString());
-        } catch (NullPointerException e) {
-            Assertions.fail();
-        }
+        Assertions.assertEquals(objectMapper.writeValueAsString(new ArrayList<>(Collections.singleton(resultFilm))),
+                getAllTask.andReturn().getResponse().getContentAsString());
     }
 
     @Test
-    void updateFilmNameBlank() {
-        Film newFilm = film.toBuilder().name("").build();
-        NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
-                () -> mockMvc.perform(MockMvcRequestBuilders.put("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(newFilm))
-                        .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        try {
-            Assertions.assertTrue(nestedServletException.getMessage().contains("Title can not be empty"));
-        } catch (NullPointerException e) {
-            Assertions.fail();
-        }
+    void updateFilmNameBlank() throws Exception {
+        Film newFilm = film.toBuilder().id(1).name(null).build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(film)).accept(MediaType.APPLICATION_JSON));
+        putToFilmBadRequest(newFilm, "Title can not be empty");
     }
 
     @Test
-    void updateFilmDescriptionMoreThan200Length() {
+    void updateFilmDescriptionMoreThan200Length() throws Exception {
         Film newFilm = film.toBuilder().description(film.getDescription() + film.getDescription()).build();
-        NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
-                () -> mockMvc.perform(MockMvcRequestBuilders.put("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(newFilm))
-                        .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        try {
-            Assertions.assertTrue(nestedServletException.getMessage().contains("Description should be less than 200 length"));
-        } catch (NullPointerException e) {
-            Assertions.fail();
-        }
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(film)).accept(MediaType.APPLICATION_JSON));
+        putToFilmBadRequest(newFilm, "Description should be less than 200 length");
     }
 
     @Test
-    void updateFilmIncorrectDate() {
+    void updateFilmIncorrectDate() throws Exception {
         Film newFilm = film.toBuilder().releaseDate(LocalDate.MIN).build();
-        NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
-                () -> mockMvc.perform(MockMvcRequestBuilders.put("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(newFilm))
-                        .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        try {
-            Assertions.assertTrue(nestedServletException.getMessage().contains("Release date less than min release date"));
-        } catch (NullPointerException e) {
-            Assertions.fail();
-        }
-
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(film)).accept(MediaType.APPLICATION_JSON));
+        putToFilmBadRequest(newFilm, ("Release date less than min release date"));
     }
 
     @Test
-    void updateFilmIncorrectDuration() {
+    void updateFilmIncorrectDuration() throws Exception {
         Film newFilm = film.toBuilder().duration(-1).build();
-        NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
-                () -> mockMvc.perform(MockMvcRequestBuilders.put("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(newFilm))
-                        .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        try {
-            Assertions.assertTrue(nestedServletException.getMessage().contains("Duration should be greater than 0"));
-        } catch (NullPointerException e) {
-            Assertions.fail();
-        }
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(film)).accept(MediaType.APPLICATION_JSON));
+        putToFilmBadRequest(newFilm, ("Duration should be greater than 0"));
     }
 
     @Test
-    void updateFilmNotFound() {
+    void updateFilmNotFound() throws Exception {
         Film newFilm = film.toBuilder().id(9999).build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(film)).accept(MediaType.APPLICATION_JSON));
         NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
-                () -> mockMvc.perform(MockMvcRequestBuilders.put("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(newFilm))
-                        .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isBadRequest()));
-        try {
-            Assertions.assertTrue(nestedServletException.getMessage().contains("Film not found"));
-        } catch (NullPointerException e) {
-            Assertions.fail();
-        }
+                () ->mockMvc.perform(MockMvcRequestBuilders.put("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(newFilm)).accept(MediaType.APPLICATION_JSON)));
+        Assertions.assertTrue(nestedServletException.getMessage().contains("Film not found"));
     }
 
     @Test
@@ -205,7 +129,7 @@ class FilmControllerTest {
         Film newFilm = film.toBuilder().build();
         ResultActions createFilm = mockMvc.perform(MockMvcRequestBuilders.post("/films")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(newFilm)).accept(MediaType.APPLICATION_JSON));
+                .content(objectMapper.writeValueAsString(newFilm)).accept(MediaType.APPLICATION_JSON));
         Assertions.assertEquals(200, createFilm.andReturn().getResponse().getStatus());
         Film resultFilm = film.toBuilder()
                 .id(1)
@@ -216,12 +140,13 @@ class FilmControllerTest {
                 .build();
         ResultActions updateFilm = mockMvc.perform(MockMvcRequestBuilders.put("/films")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(resultFilm))
+                .content(objectMapper.writeValueAsString(resultFilm))
                 .accept(MediaType.APPLICATION_JSON));
         Assertions.assertEquals(200, updateFilm.andReturn().getResponse().getStatus());
         ResultActions getAllTask = mockMvc.perform(MockMvcRequestBuilders.get("/films")
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
-        Assertions.assertEquals(convertToJson(resultFilm), getAllTask.andReturn().getResponse().getContentAsString());
+        Assertions.assertEquals(objectMapper.writeValueAsString(new ArrayList<>(Collections.singleton(resultFilm))),
+                getAllTask.andReturn().getResponse().getContentAsString());
     }
 
     @Test
@@ -235,33 +160,44 @@ class FilmControllerTest {
                 .build();
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(newFilm1)).accept(MediaType.APPLICATION_JSON));
+                .content(objectMapper.writeValueAsString(newFilm1)).accept(MediaType.APPLICATION_JSON));
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(newFilm2)).accept(MediaType.APPLICATION_JSON));
+                .content(objectMapper.writeValueAsString(newFilm2)).accept(MediaType.APPLICATION_JSON));
         Film resultFilm1 = newFilm1.toBuilder().id(1).build();
         Film resultFilm2 = newFilm2.toBuilder().id(2).build();
-        String resultString = (convertToJson(resultFilm1) + "," + convertToJson(resultFilm2))
-                .replaceAll("],\\[", ",");
+        String resultString = objectMapper.writeValueAsString(List.of(resultFilm1, resultFilm2));
         ResultActions getAllTask = mockMvc.perform(MockMvcRequestBuilders.get("/films")
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
         Assertions.assertEquals(resultString, getAllTask.andReturn().getResponse().getContentAsString());
     }
 
-    private static String convertToJson(Film film) {
-        String date = "\"releaseDate\":\"" + film.getReleaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd\""));
-        return asJsonString(
-                new ArrayList<>(Collections.singleton(film)))
-                .replaceAll("\"releaseDate\":\\[\\d+,\\d+,\\d+]", date);
+    private void postToFilmBadRequest(Film film, String message) throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(film))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(result ->
+                        Assertions.assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
+                .andExpect(result ->
+                        Assertions.assertTrue(result.getResolvedException()
+                                .getMessage()
+                                .contains(message)));
     }
 
-    private static String asJsonString(final Object obj) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new JavaTimeModule());
-            return objectMapper.writeValueAsString(obj);
-        } catch (RuntimeException | JsonProcessingException e) {
-            throw new RuntimeException();
-        }
+    private void putToFilmBadRequest(Film film, String message) throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(film))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(result ->
+                        Assertions.assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
+                .andExpect(result ->
+                        Assertions.assertTrue(result.getResolvedException()
+                                .getMessage()
+                                .contains(message)));
+
     }
 }
