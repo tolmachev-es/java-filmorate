@@ -10,9 +10,14 @@
 hs_err_pid*
 out/
 target/
-!.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+.mvn
+mvnw
+mvnw.cmd
+HELP.md
+lombok.config
+suppressions.xml
 
 ### STS ###
 .apt_generated
