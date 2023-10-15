@@ -1,16 +1,21 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Builder;
 import lombok.Value;
 import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.validator.interfaces.DateTimeValidatorCustom;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Value
 @Builder(toBuilder = true)
 public class Film {
+    public static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
     int id;
     @NotBlank(message = "Title can not be empty") @NotNull
     String name;
@@ -21,5 +26,10 @@ public class Film {
     LocalDate releaseDate;
     @Positive(message = "Duration should be greater than 0")
     int duration;
-    public static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
+    @Builder.Default
+    int rate = 0;
+    @JsonBackReference
+    Set<User> likes;
+
+
 }

@@ -3,7 +3,8 @@ package ru.yandex.practicum.filmorate.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -11,9 +12,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.util.NestedServletException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +23,8 @@ import java.util.List;
 
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@WebMvcTest(FilmController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 class FilmControllerTest {
     @Autowired
     MockMvc mockMvc;
@@ -117,11 +120,16 @@ class FilmControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(film)).accept(MediaType.APPLICATION_JSON));
-        NestedServletException nestedServletException = Assertions.assertThrows(NestedServletException.class,
-                () -> mockMvc.perform(MockMvcRequestBuilders.put("/films")
+        mockMvc.perform(MockMvcRequestBuilders.put("/films")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newFilm)).accept(MediaType.APPLICATION_JSON)));
-        Assertions.assertTrue(nestedServletException.getMessage().contains("Film not found"));
+                .content(objectMapper.writeValueAsString(newFilm))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(f ->
+                        Assertions.assertTrue(f.getResponse().getStatus() == HttpServletResponse.SC_NOT_FOUND))
+                .andExpect(f ->
+                        Assertions.assertTrue(
+                                f.getResponse().getContentAsString(Charset.defaultCharset()).contains("Фильм не найден")));
+
     }
 
     @Test

@@ -1,55 +1,67 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/users")
 public class UserController {
-    private int id = 1;
-    private final Map<Integer, User> userMap = new HashMap<>();
 
-    @PostMapping("/users")
+    private final UserService userService;
+
+    @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        log.trace("Start create user");
-        User newUser = user.toBuilder()
-                .id(getNextId())
-                .name((user.getName() == null || user.getName().isBlank()) ? user.getLogin() : user.getName())
-                .build();
-        userMap.put(newUser.getId(), newUser);
-        return newUser;
+        log.info("Start create user");
+        return userService.createUser(user);
     }
 
-    @PutMapping("/users")
+    @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        if (userMap.containsKey(user.getId())) {
-            User newUser = userMap.get(user.getId()).toBuilder()
-                    .email(user.getEmail())
-                    .login(user.getLogin())
-                    .name(user.getName().isEmpty() ? user.getLogin() : user.getName())
-                    .birthday(user.getBirthday())
-                    .build();
-            userMap.put(newUser.getId(), newUser);
-            return newUser;
-        } else {
-            throw new ValidationException("User not found");
-        }
+        log.info("Start update user");
+        return userService.updateUser(user);
     }
 
-    @GetMapping("/users")
+    @GetMapping
     public List<User> getAllUser() {
-        return new ArrayList<>(userMap.values());
+        log.info("Start get all user");
+        return userService.getAllUser();
     }
 
-    private int getNextId() {
-        return id++;
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable Integer id) {
+        log.info("Start getting user by id");
+        return userService.getUser(id);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public User addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        log.info("Start add friend");
+        return userService.addNewFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public User removeFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        log.info("Start remove friend");
+        return userService.removeFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriendsByUser(@PathVariable Integer id) {
+        log.info("Start get friend by userId");
+        return userService.getFriendsList(id);
+    }
+
+    @GetMapping("{id}/friends/common/{otherId}")
+    public List<User> getMutualFriend(@PathVariable Integer id, @PathVariable Integer otherId) {
+        log.info("Start get mutual friend");
+        return userService.getMutualFriendsList(id, otherId);
     }
 }
