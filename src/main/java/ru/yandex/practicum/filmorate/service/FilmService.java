@@ -1,11 +1,9 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
@@ -21,11 +19,10 @@ public class FilmService {
 
     private final InMemoryFilmStorage inMemoryFilmStorage;
     private final InMemoryUserStorage inMemoryUserStorage;
-    @Value(value = "1")
-    private int filmId;
+    private int filmId = 1;
 
     public Film createFilm(Film film) {
-        return inMemoryFilmStorage.updateFilm(film.toBuilder()
+        return inMemoryFilmStorage.createFilm(film.toBuilder()
                 .id(getNextId())
                 .likes(new HashSet<>())
                 .rate(film.getRate())
@@ -51,15 +48,15 @@ public class FilmService {
 
     public Film addLike(Integer filmId, Integer userId) {
         Film filmToUpdate = inMemoryFilmStorage.getFilm(filmId);
-        Set<User> users = filmToUpdate.getLikes();
-        users.add(inMemoryUserStorage.getUser(userId));
+        Set<Integer> users = filmToUpdate.getLikes();
+        users.add(inMemoryUserStorage.getUser(userId).getId());
         return inMemoryFilmStorage.updateFilm(filmToUpdate.toBuilder().likes(users).build());
     }
 
     public Film removeLike(Integer filmId, Integer userId) {
         Film filmToUpdate = inMemoryFilmStorage.getFilm(filmId);
-        Set<User> users = filmToUpdate.getLikes();
-        users.remove(inMemoryUserStorage.getUser(userId));
+        Set<Integer> users = filmToUpdate.getLikes();
+        users.remove(inMemoryUserStorage.getUser(userId).getId());
         return inMemoryFilmStorage.updateFilm(filmToUpdate.toBuilder().likes(users).build());
     }
 
@@ -70,7 +67,7 @@ public class FilmService {
                     .likes(oldFilm.getLikes())
                     .build());
         } catch (RuntimeException e) {
-            throw new NotFoundException("Фильм не найден");
+            throw new NotFoundException("Film not found");
         }
     }
 

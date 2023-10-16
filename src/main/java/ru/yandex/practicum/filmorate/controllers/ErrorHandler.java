@@ -7,6 +7,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import ru.yandex.practicum.filmorate.exception.AlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
@@ -35,7 +36,12 @@ public class ErrorHandler {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Map<String, String>> handle(final NotFoundException exception) {
-        return new ResponseEntity<>(Map.of("error", exception.getMessage()), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(Map.of("not found error", exception.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AlreadyExistException.class)
+    public ResponseEntity<Map<String, String>> handle(final AlreadyExistException exception) {
+        return new ResponseEntity<>(Map.of("already exist error", exception.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler

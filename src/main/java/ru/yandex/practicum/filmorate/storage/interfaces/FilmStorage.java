@@ -13,4 +13,6 @@ public interface FilmStorage {
     Film updateFilm(Film film);
 
     List<Film> getAllFilms();
+
+    Film createFilm(Film film);
 }

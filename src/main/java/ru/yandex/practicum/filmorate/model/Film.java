@@ -15,7 +15,7 @@ import java.util.Set;
 @Value
 @Builder(toBuilder = true)
 public class Film {
-    public static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
+    private static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
     int id;
     @NotBlank(message = "Title can not be empty") @NotNull
     String name;
@@ -29,7 +29,5 @@ public class Film {
     @Builder.Default
     int rate = 0;
     @JsonBackReference
-    Set<User> likes;
-
-
+    Set<Integer> likes;
 }

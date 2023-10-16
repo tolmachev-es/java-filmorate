@@ -1,7 +1,8 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,9 +29,6 @@ import java.util.List;
 class FilmControllerTest {
     @Autowired
     MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-
     Film film = Film.builder()
             .id(1)
             .name("The Man From Earth")
@@ -39,6 +37,8 @@ class FilmControllerTest {
                     "departing university professor, who puts forth the notion that he is more than 14,000 years old.")
             .duration(87)
             .build();
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     void createFilmNameBlank() throws Exception {
@@ -121,14 +121,14 @@ class FilmControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(film)).accept(MediaType.APPLICATION_JSON));
         mockMvc.perform(MockMvcRequestBuilders.put("/films")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newFilm))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newFilm))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(f ->
                         Assertions.assertTrue(f.getResponse().getStatus() == HttpServletResponse.SC_NOT_FOUND))
                 .andExpect(f ->
                         Assertions.assertTrue(
-                                f.getResponse().getContentAsString(Charset.defaultCharset()).contains("Фильм не найден")));
+                                f.getResponse().getContentAsString(Charset.defaultCharset()).contains("Film not found")));
 
     }
 
