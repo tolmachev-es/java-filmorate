@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Builder;
 import lombok.Value;
 
@@ -22,6 +21,5 @@ public class User {
     String name = "";
     @Past(message = "Birthday must should be less than today")
     LocalDate birthday;
-    @JsonBackReference
     Set<Integer> friends;
 }

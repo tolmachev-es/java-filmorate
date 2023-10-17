@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -36,6 +37,7 @@ class FilmControllerTest {
             .description("It stars David Lee Smith as John Oldman, a " +
                     "departing university professor, who puts forth the notion that he is more than 14,000 years old.")
             .duration(87)
+            .likes(new HashSet<>())
             .build();
     @Autowired
     private ObjectMapper objectMapper;

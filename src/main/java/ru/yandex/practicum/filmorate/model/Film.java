@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Builder;
 import lombok.Value;
 import org.hibernate.validator.constraints.Length;
@@ -26,8 +25,6 @@ public class Film {
     LocalDate releaseDate;
     @Positive(message = "Duration should be greater than 0")
     int duration;
-    @Builder.Default
-    int rate = 0;
-    @JsonBackReference
+    int rate;
     Set<Integer> likes;
 }

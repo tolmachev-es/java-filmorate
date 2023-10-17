@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
@@ -34,14 +33,10 @@ public class UserService {
     }
 
     public User updateUser(User user) {
-        try {
-            User oldUser = inMemoryUserStorage.getUser(user.getId());
-            return inMemoryUserStorage.updateUser(user.toBuilder()
-                    .friends(oldUser.getFriends())
-                    .build());
-        } catch (RuntimeException e) {
-            throw new NotFoundException("Пользователь не найден");
-        }
+        User oldUser = inMemoryUserStorage.getUser(user.getId());
+        return inMemoryUserStorage.updateUser(user.toBuilder()
+                .friends(oldUser.getFriends())
+                .build());
     }
 
     public List<User> getFriendsList(int userId) {
@@ -65,40 +60,16 @@ public class UserService {
     }
 
     public User addNewFriend(int userId1, int userId2) {
-        inMemoryUserStorage.getUser(userId1).toBuilder()
-                .friends(getAdditionUserList(userId1, userId2))
-                .build();
-        inMemoryUserStorage.getUser(userId2).toBuilder()
-                .friends(getAdditionUserList(userId2, userId1))
-                .build();
+        inMemoryUserStorage.getUser(userId1).getFriends().add(inMemoryUserStorage.getUser(userId2).getId());
+        inMemoryUserStorage.getUser(userId2).getFriends().add(inMemoryUserStorage.getUser(userId1).getId());
         return inMemoryUserStorage.getUser(userId1);
     }
 
     public User removeFriend(int userId1, int userId2) {
-        inMemoryUserStorage.getUser(userId1).toBuilder()
-                .friends(getRemoveUserList(userId1, userId2))
-                .build();
-        inMemoryUserStorage.getUser(userId2).toBuilder()
-                .friends(getRemoveUserList(userId2, userId1))
-                .build();
+        inMemoryUserStorage.getUser(userId1).getFriends().remove(inMemoryUserStorage.getUser(userId2).getId());
+        inMemoryUserStorage.getUser(userId2).getFriends().remove(inMemoryUserStorage.getUser(userId1).getId());
         return inMemoryUserStorage.getUser(userId1);
     }
-
-    private Set<Integer> getAdditionUserList(int inUser, int fromUser) {
-        Set<Integer> newUserList = inMemoryUserStorage.getUser(inUser).getFriends();
-        Set<Integer> secondUserList = inMemoryUserStorage.getUser(fromUser).getFriends();
-        secondUserList.add(inUser);
-        newUserList.add(fromUser);
-        return newUserList;
-    }
-
-    private Set<Integer> getRemoveUserList(int fromUser, int userToRemove) {
-        Set<Integer> withoutUserToRemove = inMemoryUserStorage.getUser(fromUser).getFriends();
-        withoutUserToRemove.remove(inMemoryUserStorage.getUser(userToRemove).getId());
-        //сделано так, что бы дернуть проверку что пользователь есть в списке
-        return withoutUserToRemove;
-    }
-
 
     private int getNextId() {
         return userId++;
