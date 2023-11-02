@@ -14,9 +14,13 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = DateTimeValidator.class)
 public @interface DateTimeValidatorCustom {
     public abstract String max() default "";
+
     public abstract String message() default "Date is not valid";
+
     public abstract String pattern() default "dd/MM/yyyy";
+
     public abstract Class<?>[] groups() default {};
+
     public abstract Class<? extends Payload>[] payload() default {};
 
 }

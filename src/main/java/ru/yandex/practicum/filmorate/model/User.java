@@ -3,8 +3,11 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Builder;
 import lombok.Value;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Past;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Value
 @Builder(toBuilder = true)
@@ -18,4 +21,5 @@ public class User {
     String name = "";
     @Past(message = "Birthday must should be less than today")
     LocalDate birthday;
+    Set<Integer> friends;
 }
