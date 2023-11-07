@@ -4,12 +4,10 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.AlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -49,5 +47,25 @@ public class InMemoryFilmStorage implements FilmStorage {
             films.put(film.getId(), film);
             return film;
         }
+    }
+
+    @Override
+    public Film addLike(int filmId, User user) {
+        Film filmToUpdate = getFilm(filmId);
+        Set<Integer> users = filmToUpdate.getLikes();
+        users.add(user.getId());
+        return updateFilm(filmToUpdate.toBuilder().likes(users).build());
+    }
+
+    @Override
+    public Film removeLike(int filmId, User user) {
+        Film filmToUpdate = getFilm(filmId);
+        Set<Integer> users = filmToUpdate.getLikes();
+        users.remove(user.getId());
+        return updateFilm(filmToUpdate.toBuilder().likes(users).build());
+    }
+
+    public int getCountLike(int filmId) {
+        return getFilm(filmId).getLikes().size();
     }
 }

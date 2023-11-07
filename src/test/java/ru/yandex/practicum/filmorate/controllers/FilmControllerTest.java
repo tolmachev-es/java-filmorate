@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -14,22 +15,31 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureTestDatabase
 class FilmControllerTest {
     @Autowired
     MockMvc mockMvc;
+    Mpa mpa = Mpa.builder()
+            .id(1)
+            .build();
+
+    Mpa mpa1 = Mpa.builder()
+            .id(1)
+            .name("G")
+            .build();
     Film film = Film.builder()
             .id(1)
             .name("The Man From Earth")
@@ -37,7 +47,8 @@ class FilmControllerTest {
             .description("It stars David Lee Smith as John Oldman, a " +
                     "departing university professor, who puts forth the notion that he is more than 14,000 years old.")
             .duration(87)
-            .likes(new HashSet<>())
+            .mpa(mpa)
+            .genres(new ArrayList<>())
             .build();
     @Autowired
     private ObjectMapper objectMapper;
@@ -73,7 +84,7 @@ class FilmControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newFilm)).accept(MediaType.APPLICATION_JSON));
         Assertions.assertEquals(200, ra.andReturn().getResponse().getStatus());
-        Film resultFilm = film.toBuilder().id(1).build();
+        Film resultFilm = film.toBuilder().id(1).mpa(mpa1).build();
         ResultActions getAllTask = mockMvc.perform(MockMvcRequestBuilders.get("/films")
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
         Assertions.assertEquals(objectMapper.writeValueAsString(new ArrayList<>(Collections.singleton(resultFilm))),
@@ -147,6 +158,7 @@ class FilmControllerTest {
                 .name("Demolution man")
                 .description("Stallone and Blade punch each other in the face")
                 .releaseDate(LocalDate.of(1993, 8, 12))
+                .mpa(mpa1)
                 .build();
         ResultActions updateFilm = mockMvc.perform(MockMvcRequestBuilders.put("/films")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -167,6 +179,7 @@ class FilmControllerTest {
                 .name("Demolution man")
                 .description("Stallone and Blade punch each other in the face")
                 .releaseDate(LocalDate.of(1993, 8, 12))
+                .mpa(mpa)
                 .build();
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -174,8 +187,8 @@ class FilmControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newFilm2)).accept(MediaType.APPLICATION_JSON));
-        Film resultFilm1 = newFilm1.toBuilder().id(1).build();
-        Film resultFilm2 = newFilm2.toBuilder().id(2).build();
+        Film resultFilm1 = newFilm1.toBuilder().id(1).mpa(mpa1).build();
+        Film resultFilm2 = newFilm2.toBuilder().id(2).mpa(mpa1).build();
         String resultString = objectMapper.writeValueAsString(List.of(resultFilm1, resultFilm2));
         ResultActions getAllTask = mockMvc.perform(MockMvcRequestBuilders.get("/films")
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));

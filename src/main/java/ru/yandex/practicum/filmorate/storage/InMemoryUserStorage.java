@@ -6,10 +6,8 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -49,6 +47,48 @@ public class InMemoryUserStorage implements UserStorage {
         } else {
             users.put(user.getId(), user);
             return user;
+        }
+    }
+
+    @Override
+    public List<User> getFriendsList(int userId) {
+        return getUser(userId)
+                .getFriends()
+                .stream()
+                .map(this::getUser)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public User addNewFriend(int userId1, int userId2) {
+        getUser(userId1).getFriends().add(getUser(userId2).getId());
+        getUser(userId2).getFriends().add(getUser(userId1).getId());
+        return getUser(userId2);
+    }
+
+    @Override
+    public User removeFriend(int userId1, int userId2) {
+        getUser(userId1).getFriends().remove(getUser(userId2).getId());
+        getUser(userId2).getFriends().remove(getUser(userId1).getId());
+        return getUser(userId1);
+    }
+
+    @Override
+    public List<User> getMutualFriendsList(int userId1, int userId2) {
+        Set<Integer> allFriendsFirstUser = getFriendsList(userId1).stream()
+                .map(User::getId)
+                .collect(Collectors.toSet());
+        Set<Integer> allFriendsSecondUser = getFriendsList(userId2)
+                .stream()
+                .map(User::getId)
+                .collect(Collectors.toSet());
+        if (allFriendsSecondUser == null) {
+            return new ArrayList<>();
+        } else {
+            allFriendsFirstUser.retainAll(allFriendsSecondUser);
+            return allFriendsFirstUser.stream()
+                    .map(this::getUser)
+                    .collect(Collectors.toList());
         }
     }
 }
