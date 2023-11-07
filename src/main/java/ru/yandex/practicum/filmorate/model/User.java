@@ -23,5 +23,5 @@ public class User {
     @Past(message = "Birthday must should be less than today")
     LocalDate birthday;
     @JsonIgnore
-    Set<Integer> friends;//не совсем было понятно, нужно ли это удалять
+    Set<Integer> friends;
 }
