@@ -127,8 +127,8 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getSortedFilm(int count) {
         List<Film> films = new ArrayList<>();
-        for (Integer id:
-             likeDao.getCountFilmLike(count)) {
+        for (Integer id :
+                likeDao.getCountFilmLike(count)) {
             films.add(getFilm(id));
         }
         return films;
