@@ -4,6 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.AlreadyExistException;
@@ -11,6 +14,11 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -65,11 +73,21 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User createUser(User user) {
-        jdbcTemplate.update("INSERT INTO USERS (NAME, EMAIL, LOGIN, BIRTHDAY) VALUES (?, ?, ?, ?)",
-                user.getName(), user.getEmail(), user.getLogin(), user.getBirthday());
-        SqlRowSet userRow = jdbcTemplate.queryForRowSet("select max(user_id) as max_user_id from users");
-        userRow.next();
-        return getUser(Integer.parseInt(Objects.requireNonNull(userRow.getString("max_user_id"))));
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement statement = con.prepareStatement(
+                        "INSERT INTO USERS (NAME, EMAIL, LOGIN, BIRTHDAY) VALUES (?, ?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS);
+                statement.setString(1, user.getName());
+                statement.setString(2, user.getEmail());
+                statement.setString(3, user.getLogin());
+                statement.setDate(4, Date.valueOf(user.getBirthday()));
+                return statement;
+            }
+        }, keyHolder);
+        return getUser(Objects.requireNonNull(keyHolder.getKey()).intValue());
     }
 
     @Override

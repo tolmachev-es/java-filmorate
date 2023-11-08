@@ -19,6 +19,8 @@ import ru.yandex.practicum.filmorate.storage.UserDbStorage;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.*;
+
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -148,20 +150,6 @@ class FilmStorageTest {
         NotFoundException notFoundException = Assertions.assertThrows(
                 NotFoundException.class, () -> filmDbStorage.getFilm(1));
         Assertions.assertEquals("Film not found", notFoundException.getMessage());
-    }
-
-    @Test
-    void addLikeAndRemove() {
-        filmDbStorage.createFilm(film);
-        userDbStorage.createUser(user);
-        userDbStorage.createUser(user1);
-        User userAfterId = user.toBuilder().id(1).build();
-        User userAfterId1 = user1.toBuilder().id(2).build();
-        filmDbStorage.addLike(1, userAfterId);
-        filmDbStorage.addLike(1, userAfterId1);
-        Assertions.assertEquals(filmDbStorage.getCountLike(1), 2);
-        filmDbStorage.removeLike(1, userAfterId);
-        Assertions.assertEquals(filmDbStorage.getCountLike(1), 1);
     }
 
     @Test

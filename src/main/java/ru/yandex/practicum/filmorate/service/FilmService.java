@@ -38,10 +38,7 @@ public class FilmService {
     }
 
     public List<Film> getSortFilm(Integer count) {
-        return filmStorage.getAllFilms().stream()
-                .sorted(Comparator.comparing(f -> filmStorage.getCountLike(f.getId()), Comparator.reverseOrder()))
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getSortedFilm(count);
     }
 
     public Film addLike(Integer filmId, Integer userId) {
@@ -50,7 +47,6 @@ public class FilmService {
 
     public Film removeLike(Integer filmId, Integer userId) {
         return filmStorage.removeLike(filmId, userStorage.getUser(userId));
-
     }
 
     public Film updateFilm(Film film) {

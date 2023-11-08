@@ -4,6 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.GenreDao;
@@ -14,6 +17,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -87,18 +91,25 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        jdbcTemplate.update("INSERT INTO FILM (TITLE, RELEASE_DATE, DESCRIPTION, DURATION_MINUTES, RATE, MPA) " +
-                        "VALUES (?, ?, ?, ?, ?, ?)",
-                film.getName(),
-                film.getReleaseDate(),
-                film.getDescription(),
-                film.getDuration(),
-                film.getRate(),
-                film.getMpa().getId());
-        SqlRowSet userRow = jdbcTemplate.queryForRowSet("SELECT MAX(FILM_ID) AS MAX_FILM_ID FROM FILM");
-        userRow.next();
-        genreDao.setGenres(userRow.getInt("MAX_FILM_ID"), film.getGenres());
-        return getFilm(userRow.getInt("MAX_FILM_ID"));
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement statement = con.prepareStatement(
+                        "INSERT INTO FILM (TITLE, RELEASE_DATE, DESCRIPTION, DURATION_MINUTES, RATE, MPA) " +
+                                "VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                statement.setString(1, film.getName());
+                statement.setDate(2, Date.valueOf(film.getReleaseDate()));
+                statement.setString(3, film.getDescription());
+                statement.setInt(4, film.getDuration());
+                statement.setInt(5, film.getRate());
+                statement.setInt(6, film.getMpa().getId());
+                return statement;
+            }
+        }, keyHolder);
+        int primaryKey = Objects.requireNonNull(keyHolder.getKey()).intValue();
+        genreDao.setGenres(primaryKey, film.getGenres());
+        return getFilm(primaryKey);
     }
 
     @Override
@@ -113,7 +124,13 @@ public class FilmDbStorage implements FilmStorage {
         return getFilm(filmId);
     }
 
-    public int getCountLike(int filmId) {
-        return likeDao.getCountLike(filmId);
+    @Override
+    public List<Film> getSortedFilm(int count) {
+        List<Film> films = new ArrayList<>();
+        for (Integer id:
+             likeDao.getCountFilmLike(count)) {
+            films.add(getFilm(id));
+        }
+        return films;
     }
 }

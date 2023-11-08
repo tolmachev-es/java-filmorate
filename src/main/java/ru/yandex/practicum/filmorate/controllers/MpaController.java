@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.dao.MpaDao;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.service.MpaService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -22,18 +22,18 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/mpa")
 public class MpaController {
-    private final MpaDao mpaDao;
+    private final MpaService mpaService;
 
     @Operation(summary = "Получение рейтинга")
     @ApiResponse(responseCode = "400", description = "Mpa not found")
     @GetMapping("/{id}")
     public Mpa getMpa(@Valid @PathVariable Integer id) {
-        return mpaDao.getMpa(id);
+        return mpaService.getMpa(id);
     }
 
     @Operation(summary = "Получение всех рейтингов")
     @GetMapping
     public List<Mpa> getAllMpa() {
-        return mpaDao.getAllMpa();
+        return mpaService.getAllMpa();
     }
 }

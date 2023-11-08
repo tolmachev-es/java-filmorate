@@ -20,5 +20,5 @@ public interface FilmStorage {
 
     Film removeLike(int filmId, User user);
 
-    int getCountLike(int filmId);
+    List<Film> getSortedFilm(int count);
 }

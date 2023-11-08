@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.AlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class LikeDao {
     private final JdbcTemplate jdbcTemplate;
@@ -36,15 +39,18 @@ public class LikeDao {
         }
     }
 
-    public int getCountLike(int filmId) {
+    public List<Integer> getCountFilmLike(int countFilms) {
+        List<Integer> resultFilmId = new ArrayList<>();
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(
-                "SELECT COUNT(USER_ID) AS COUNT FROM LIKES WHERE FILM_ID = ?",
-                filmId);
-        if (sqlRowSet.next()) {
-            return sqlRowSet.getInt("COUNT");
-        } else {
-            return 0;
+                "SELECT f.FILM_ID, COUNT(l.USER_ID) AS d FROM FILM f \n" +
+                        "LEFT OUTER JOIN LIKES l ON f.FILM_ID = l.FILM_ID \n" +
+                        "GROUP BY f.FILM_ID\n" +
+                        "ORDER BY d DESC \n" +
+                        "LIMIT ?", countFilms);
+        while (sqlRowSet.next()) {
+            resultFilmId.add(sqlRowSet.getInt("FILM_ID"));
         }
+        return resultFilmId;
     }
 
     private boolean hasLike(int filmId, int userId) {
