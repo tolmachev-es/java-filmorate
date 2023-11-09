@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -11,13 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class LikeDao {
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public LikeDao(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     public void addLike(int filmId, int userId) {
         if (hasLike(filmId, userId)) {
@@ -39,7 +35,7 @@ public class LikeDao {
         }
     }
 
-    public List<Integer> getCountFilmLike(int countFilms) {
+    public List<Integer> getMostLikeFilmIds(int countFilms) {
         List<Integer> resultFilmId = new ArrayList<>();
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(
                 "SELECT f.FILM_ID, COUNT(l.USER_ID) AS d FROM FILM f \n" +

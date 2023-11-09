@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.dao;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -13,13 +13,9 @@ import java.util.List;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class MpaDao {
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public MpaDao(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     public Mpa getMpa(int rateId) {
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet("SELECT NAME FROM RATING WHERE RATE_ID = ?", rateId);

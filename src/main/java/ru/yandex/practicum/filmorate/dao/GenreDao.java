@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -11,13 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class GenreDao {
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public GenreDao(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     public Genre getGenre(int id) {
         SqlRowSet genreRaw = jdbcTemplate.queryForRowSet("SELECT NAME FROM GENRE WHERE GENRE_ID = ?", id);

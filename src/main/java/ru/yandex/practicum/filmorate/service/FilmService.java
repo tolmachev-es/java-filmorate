@@ -1,24 +1,25 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class FilmService {
+    @Qualifier("filmDbStorage")
+    @NotNull
     private final FilmStorage filmStorage;
+    @Qualifier("userDbStorage")
+    @NotNull
     private final UserStorage userStorage;
-
-    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage,
-                       @Qualifier("UserDbStorage") UserStorage userStorage) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
-    }
 
     public Film createFilm(Film film) {
         return filmStorage.createFilm(film.toBuilder()

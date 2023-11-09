@@ -1,20 +1,21 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
+    @Qualifier("userDbStorage")
+    @NotNull
     private final UserStorage userStorage;
-
-    public UserService(@Qualifier("UserDbStorage") UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
 
     public List<User> getAllUser() {
         return userStorage.getAllUsers();

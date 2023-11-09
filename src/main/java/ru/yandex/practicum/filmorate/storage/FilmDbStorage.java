@@ -1,8 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -24,20 +23,12 @@ import java.util.Objects;
 
 @Slf4j
 @Component
-@Qualifier(value = "FilmDbStorage")
+@RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private final MpaDao mpaDao;
     private final GenreDao genreDao;
     private final LikeDao likeDao;
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public FilmDbStorage(MpaDao mpaDao, GenreDao genreDao, LikeDao likeDao, JdbcTemplate jdbcTemplate) {
-        this.mpaDao = mpaDao;
-        this.genreDao = genreDao;
-        this.likeDao = likeDao;
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public Film getFilm(Integer id) {
@@ -128,7 +119,7 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> getSortedFilm(int count) {
         List<Film> films = new ArrayList<>();
         for (Integer id :
-                likeDao.getCountFilmLike(count)) {
+                likeDao.getMostLikeFilmIds(count)) {
             films.add(getFilm(id));
         }
         return films;
