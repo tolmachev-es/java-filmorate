@@ -13,4 +13,12 @@ public interface UserStorage {
     List<User> getAllUsers();
 
     User createUser(User user);
+
+    User removeFriend(int userId1, int userId2);
+
+    List<User> getMutualFriendsList(int userId1, int userId2);
+
+    List<User> getFriendsList(int userId);
+
+    User addNewFriend(int userId1, int userId2);
 }

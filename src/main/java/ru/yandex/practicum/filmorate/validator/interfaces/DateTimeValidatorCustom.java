@@ -13,14 +13,14 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = DateTimeValidator.class)
 public @interface DateTimeValidatorCustom {
-    public abstract String max() default "";
+    String max() default "";
 
-    public abstract String message() default "Date is not valid";
+    String message() default "Date is not valid";
 
-    public abstract String pattern() default "dd/MM/yyyy";
+    String pattern() default "dd/MM/yyyy";
 
-    public abstract Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-    public abstract Class<? extends Payload>[] payload() default {};
+    Class<? extends Payload>[] payload() default {};
 
 }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Value;
 import org.hibernate.validator.constraints.Length;
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Value
@@ -26,5 +28,9 @@ public class Film {
     @Positive(message = "Duration should be greater than 0")
     int duration;
     int rate;
+    Mpa mpa;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     Set<Integer> likes;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    List<Genre> genres;
 }

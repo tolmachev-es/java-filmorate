@@ -1,77 +1,57 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
-import java.util.ArrayList;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final InMemoryUserStorage inMemoryUserStorage;
-    private int userId = 1;
+    @Qualifier("userDbStorage")
+    @NotNull
+    private final UserStorage userStorage;
 
     public List<User> getAllUser() {
-        return inMemoryUserStorage.getAllUsers();
+        return userStorage.getAllUsers();
     }
 
-    public User getUser(int userId) {
-        return inMemoryUserStorage.getUser(userId);
+    public User getUser(Integer userId) {
+        return userStorage.getUser(userId);
     }
 
     public User createUser(User user) {
-        return inMemoryUserStorage.createUser(user.toBuilder()
+        return userStorage.createUser(user.toBuilder()
                 .name((user.getName() == null || user.getName().isBlank()) ? user.getLogin() : user.getName())
                 .friends(new HashSet<>())
-                .id(getNextId()).build());
+                .build());
     }
 
     public User updateUser(User user) {
-        User oldUser = inMemoryUserStorage.getUser(user.getId());
-        return inMemoryUserStorage.updateUser(user.toBuilder()
+        User oldUser = userStorage.getUser(user.getId());
+        return userStorage.updateUser(user.toBuilder()
                 .friends(oldUser.getFriends())
                 .build());
     }
 
     public List<User> getFriendsList(int userId) {
-        return inMemoryUserStorage.getUser(userId)
-                .getFriends()
-                .stream()
-                .map(inMemoryUserStorage::getUser)
-                .collect(Collectors.toList());
+        return userStorage.getFriendsList(userId);
     }
 
     public List<User> getMutualFriendsList(int userId1, int userId2) {
-        Set<Integer> allFriendsFirstUser = new HashSet<>(inMemoryUserStorage.getUser(userId1).getFriends());
-        Set<Integer> allFriendsSecondUser = new HashSet<>(inMemoryUserStorage.getUser(userId2).getFriends());
-        if (allFriendsSecondUser == null) {
-            return new ArrayList<>();
-        } else {
-            allFriendsFirstUser.retainAll(allFriendsSecondUser);
-            return allFriendsFirstUser.stream().map(inMemoryUserStorage::getUser).collect(Collectors.toList());
-        }
-
+        return userStorage.getMutualFriendsList(userId1, userId2);
     }
 
     public User addNewFriend(int userId1, int userId2) {
-        inMemoryUserStorage.getUser(userId1).getFriends().add(inMemoryUserStorage.getUser(userId2).getId());
-        inMemoryUserStorage.getUser(userId2).getFriends().add(inMemoryUserStorage.getUser(userId1).getId());
-        return inMemoryUserStorage.getUser(userId1);
+        return userStorage.addNewFriend(userId1, userId2);
     }
 
     public User removeFriend(int userId1, int userId2) {
-        inMemoryUserStorage.getUser(userId1).getFriends().remove(inMemoryUserStorage.getUser(userId2).getId());
-        inMemoryUserStorage.getUser(userId2).getFriends().remove(inMemoryUserStorage.getUser(userId1).getId());
-        return inMemoryUserStorage.getUser(userId1);
-    }
-
-    private int getNextId() {
-        return userId++;
+        return userStorage.removeFriend(userId1, userId2);
     }
 }
